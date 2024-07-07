@@ -1,46 +1,82 @@
-// main
+// main.go
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
+	"strconv"
+
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	dirFlag := flag.Bool("dir", false, "Output the directory the configuration is stored in")
+	// Initialize CLI app
+	app := cli.NewApp()
+	app.Name = "gee"
+	app.Usage = "A CLI tool for performing searches using different engines"
+	app.UsageText = "gee [flags] [search query]"
+
+	dirCommand := &cli.Command{
+		Name:  "dir",
+		Usage: "Output the directory the configuration is stored in",
+		Action: func(_ *cli.Context) error {
+			fmt.Println(GetConfigDir())
+			return nil
+		},
+	}
+
+	app.Commands = []*cli.Command{dirCommand}
 
 	// Get all engines from the file
 	engines := GetEngines()
 
-	// Store engine flags in a map
-	engineFlags := make(map[string]*bool)
+	// Define a flag to track if any engine-specific flag is set
+	engineFlags := make(map[string]bool)
 
-	// Loop through engines and check if flag was supplied, store in engineFlags
+	// Engine-specific commands and flags
 	for _, engine := range engines {
-		engineFlags[engine.Command] = flag.Bool(engine.Command, false, fmt.Sprintf("Use %s search engine", engine.Command))
+		command := engine.Command
+		app.Flags = append(app.Flags, &cli.BoolFlag{
+			Name:        command,
+			Usage:       fmt.Sprintf("Enable %s search engine", command),
+			DefaultText: strconv.FormatBool(engine.Default),
+			Category:    "AVAILABLE SEARCH ENGINES:",
+		})
+		engineFlags[command] = false
 	}
 
-	argv := os.Args
-	// Assume the last argument is the search query
-	// Make this better in future, so the "" is not not required for multiple words
-	searchQuery := argv[len(argv)-1]
-
-	flag.Parse()
-
-	if *dirFlag {
-		fmt.Println(GetConfigDir())
-	}
-
-	if searchQuery == "" {
-		fmt.Println("No search query was supplied.")
-		os.Exit(1)
-	}
-
-	// Loop through engines and perform search if query was supplied
-	for _, engine := range engines {
-		if *engineFlags[engine.Command] {
-			engine.Search(searchQuery)
+	// Set the action for the app
+	app.Action = func(c *cli.Context) error {
+		// Get the search query (last argument)
+		args := c.Args()
+		if args.Len() < 1 {
+			return fmt.Errorf("no search query was supplied")
 		}
+		searchQuery := args.Get(args.Len() - 1)
+
+		// Check if any engine-specific flag is set
+		engineProvided := false
+		for command := range engineFlags {
+			if c.Bool(command) {
+				engineFlags[command] = true
+				engineProvided = true
+			}
+		}
+
+		// Loop through engines and perform search if flag is set
+		for _, engine := range engines {
+			if (engineProvided && engineFlags[engine.Command]) || (!engineProvided && engine.Default) {
+				engine.Search(searchQuery)
+			}
+		}
+
+		return nil
+	}
+
+	// Run the CLI app
+	err := app.Run(os.Args)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }

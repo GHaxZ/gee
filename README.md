@@ -12,10 +12,7 @@ An example would look like this:
 
 ```json
 [
-  {
-    "command": "g",
-    "searchString": "https://www.google.com/search?q=[QUERY]"
-  },
+  { "command": "g", "searchString": "https://www.google.com/search?q=[QUERY]" },
   {
     "command": "b",
     "searchString": "https://search.brave.com/search?q=[QUERY]"
@@ -41,10 +38,10 @@ This allows me to run `gee -yt -b -d -wiki "Never gonna give you up"` for exampl
 
 ### TODO:
 
-- [ ] Add "default" option in config to search with default engines if none are specified
+- [x] Add "default" option in config to search with default engines if none are specified
+- [x] Improve "--help" formatting
 - [ ] Change argument parsing, so "" is not required
 - [ ] Auto generate default "engines.json" config
-- [ ] Improve "--help" formatting
 
 > [!NOTE]
 > Keep in mind that this project is not really intended to be useful, just a fun exercise for me.

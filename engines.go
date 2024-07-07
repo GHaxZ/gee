@@ -17,6 +17,7 @@ import (
 type Engine struct {
 	Command      string `json:"command"`
 	SearchString string `json:"searchString"`
+	Default      bool   `json:"default"`
 }
 
 // Search - Search the specified searchQuery using this engine
@@ -33,6 +34,7 @@ var engines = make([]Engine, 0)
 
 const enginesFile = "engines.json"
 
+// GetConfigDir - Get the directory where the config files are stored
 func GetConfigDir() string {
 	return xdg.ConfigHome + "/gee/"
 }
