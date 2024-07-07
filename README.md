@@ -6,6 +6,8 @@ gee is a small command line tool I wrote to become more familier with Go. It is 
 
 It can be configured using a engines.json file in the operating system conventional config file directory.
 
+You can find out the storage directory using the `-dir` flag: `gee -dir`
+
 An example would look like this:
 
 ```json
