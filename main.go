@@ -8,6 +8,8 @@ import (
 )
 
 func main() {
+	dirFlag := flag.Bool("dir", false, "Output the directory the configuration is stored in")
+
 	// Get all engines from the file
 	engines := GetEngines()
 
@@ -25,6 +27,10 @@ func main() {
 	searchQuery := argv[len(argv)-1]
 
 	flag.Parse()
+
+	if *dirFlag {
+		fmt.Println(GetConfigDir())
+	}
 
 	if searchQuery == "" {
 		fmt.Println("No search query was supplied.")

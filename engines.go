@@ -33,7 +33,7 @@ var engines = make([]Engine, 0)
 
 const enginesFile = "engines.json"
 
-func getConfigDir() string {
+func GetConfigDir() string {
 	return xdg.ConfigHome + "/gee/"
 }
 
@@ -48,7 +48,7 @@ func GetEngines() []Engine {
 
 // loadEngines - Load all engines from the config file
 func loadEngines() {
-	filepath := getConfigDir() + enginesFile
+	filepath := GetConfigDir() + enginesFile
 
 	file, err := os.Open(filepath)
 	if err != nil {
